@@ -3,7 +3,7 @@ from app import app, db, login_manager
 from app.models import User, Posts
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
-from webforms import LoginForm, PostForm, UserForm, PasswordForm, NameForm, SearchForm
+from app.webforms import LoginForm, PostForm, UserForm, PasswordForm, NameForm, SearchForm
 from werkzeug.utils import secure_filename
 import uuid as uuid
 import os
