@@ -12,7 +12,7 @@ app.config.from_object(Config)
 ckeditor = CKEditor(app)
 
 db = SQLAlchemy(app)
-migrate = Migrate(app)
+migrate = Migrate(app, db)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
