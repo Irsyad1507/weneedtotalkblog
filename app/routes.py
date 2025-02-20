@@ -23,7 +23,7 @@ def base():
 @login_required
 def admin():
     id = current_user.id
-    if id == 16:
+    if id == 1:
         return render_template("admin.html")
     else:
         flash("Only real admin can access the admin page")
@@ -145,26 +145,16 @@ def delete_post(id):
 
             # Return message
             flash('Post Deleted')
-
-            # Fetch all posts from database
-            posts = Posts.query.order_by(Posts.date_posted)
-            return render_template('posts.html', posts=posts)
-
+            return redirect(url_for('posts'))
 
         except:
             # Return error message
             flash('Failed to delete')
-
-            # Fetch all posts from database
-            posts = Posts.query.order_by(Posts.date_posted)
-            return render_template('posts.html', posts=posts)
+            return redirect(url_for('posts'))
     else:
         # Return message
         flash("You cannot delete someone else's post...")
-
-        # Fetch all posts from database
-        posts = Posts.query.order_by(Posts.date_posted)
-        return render_template('posts.html', posts=posts)
+        return redirect(url_for('posts'))
 
 @app.route('/posts')
 def posts():
@@ -201,8 +191,7 @@ def edit_post(id):
         return render_template('edit_post.html', form=form)
     else:
         flash("You cannot edit someone else's post...")
-        posts = Posts.query.order_by(Posts.date_posted)
-        return render_template('posts.html', posts=posts)
+        return redirect(url_for('posts'))
 
 
 
@@ -231,23 +220,6 @@ def add_post():
     # Redirect to webpage
     return render_template('add_post.html', form=form)
 
-
-
-
-# JSON Test
-@app.route('/date')
-def get_current_date():
-    favourite_pizza = {
-        "Person1" : "Pepperoni", 
-        "Person2" : "Cheese", 
-        "Person3" : "Mushroom"
-    }
-    return favourite_pizza
-    # return {"Date" : date.today()}
-
-
-
-
     
 @app.route('/delete/<int:id>')
 @login_required
@@ -262,17 +234,11 @@ def delete(id):
             db.session.delete(user_to_delete)
             db.session.commit()
             flash('User Deleted!')
-
-            users = User.query.order_by(User.date_added)
-            return render_template("add_user.html", 
-                                form=form, 
-                                name=name, 
-                                users=users)
+            return redirect(url_for('add_user'))
 
         except:
             flash('Error deleting user')
-            return render_template("add_user.html", 
-            form=form, name=name, users=users)
+            return redirect(url_for('add_user'))
     else:
         flash('You cannot delete someone else...')
         return redirect(url_for("add_user"))
@@ -360,12 +326,6 @@ def index():
                            stuff=stuff, 
                            items=items)
 
-# localhost:5000/user/Rick
-@app.route('/user/<name>')
-
-def user(name):
-    return render_template("user.html", name=name)
-
 # Create custom error pages
 
 # Invalid URL
@@ -377,50 +337,3 @@ def pageNotFound(e):
 @app.errorhandler(500)
 def pageNotFound(e):
     return render_template("500.html"), 500
-
-# Create Password Test Page
-@app.route('/test_pw', methods=['GET', 'POST'])
-def test_pw():
-    email = None
-    password = None
-    pw_to_check = None
-    passed = None
-    form = PasswordForm()
-
-
-    # Validate Form
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password_hash.data
-        # Clear Form
-        form.email.data = ""
-        form.password_hash.data = ""
-
-        # Lookup User by Email Adress
-        pw_to_check = User.query.filter_by(email=email).first()
-
-        # Check hashed password
-        passed = check_password_hash(pw_to_check.password_hash, password)
-
-    return render_template('test_pw.html', 
-                           email=email, 
-                           password=password,
-                           pw_to_check=pw_to_check,
-                           passed=passed,   
-                           form=form)
-
-
-# Create Name Page
-@app.route('/name', methods=['GET', 'POST'])
-def name():
-    name = None
-    form = NameForm()
-    # Validate Form
-    if form.validate_on_submit():
-        name = form.name.data
-        form.name.data = ""
-        flash("Form Submitted Successfully")
-
-    return render_template('name.html', 
-                           name=name, 
-                           form=form)
